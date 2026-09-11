@@ -1,0 +1,85 @@
+{
+  "foods": [
+    {
+      "id": "1",
+      "name": "Veg Burger",
+      "price": 50,
+      "category": "Fast Food",
+      "available": true,
+      "image": "/foods/burger.jpg"
+    },
+    {
+      "id": "2",
+      "name": "Chicken Burger",
+      "price": 80,
+      "category": "Fast Food",
+      "available": true,
+      "image": "/foods/chicken-burger.jpg"
+    },
+    {
+      "id": "3",
+      "name": "Veg Pizza",
+      "price": 90,
+      "category": "Pizza",
+      "available": true,
+      "image": "/foods/pizza.jpg"
+    },
+    {
+      "id": "4",
+      "name": "Chicken Pizza",
+      "price": 120,
+      "category": "Pizza",
+      "available": true,
+      "image": "/foods/chicken-pizza.jpg"
+    },
+    {
+      "id": "5",
+      "name": "Veg Sandwich",
+      "price": 40,
+      "category": "Snacks",
+      "available": true,
+      "image": "/foods/sandwich.jpg"
+    },
+    {
+      "id": "6",
+      "name": "French Fries",
+      "price": 45,
+      "category": "Snacks",
+      "available": true,
+      "image": "/foods/fries.jpg"
+    },
+    {
+      "id": "7",
+      "name": "Chicken Biryani",
+      "price": 110,
+      "category": "Main Course",
+      "available": true,
+      "image": "/foods/biryani.jpg"
+    },
+    {
+      "id": "8",
+      "name": "Masala Dosa",
+      "price": 60,
+      "category": "South Indian",
+      "available": true,
+      "image": "/foods/dosa.jpg"
+    },
+    {
+      "id": "9",
+      "name": "Idli",
+      "price": 35,
+      "category": "South Indian",
+      "available": true,
+      "image": "/foods/idli.jpg"
+    },
+    {
+      "id": "10",
+      "name": "Cold Coffee",
+      "price": 55,
+      "category": "Beverages",
+      "available": false,
+      "image": "/foods/coffee.jpg"
+    }
+  ],
+  "orders": []
+}
