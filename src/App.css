@@ -1,0 +1,13 @@
+.food-image-container {
+  width: 100%;
+  height: 190px;
+  overflow: hidden;
+  background: #eeeeeb;
+}
+
+.food-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
