@@ -3,6 +3,8 @@ import { Routes, Route } from "react-router-dom";
 import Menu from "./pages/Menu";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
+import OrderStatus from "./pages/OrderStatus";
 
 import "./App.css";
 
@@ -23,6 +25,16 @@ function App() {
       <Route
         path="/checkout"
         element={<Checkout />}
+      />
+
+      <Route
+        path="/order-success"
+        element={<OrderSuccess />}
+      />
+
+      <Route
+        path="/order"
+        element={<OrderStatus />}
       />
 
     </Routes>

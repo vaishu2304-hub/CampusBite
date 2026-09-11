@@ -1,174 +1,192 @@
 import { useEffect, useState } from "react";
-
-import { getFoods } from "../services/api";
-
+import { useNavigate } from "react-router-dom";
 import FoodCard from "../components/FoodCard";
 import SearchBar from "../components/SearchBar";
+import { useCart } from "../context/CartContext";
+
+const API_URL = "http://localhost:3001";
 
 function Menu() {
+  const navigate = useNavigate();
+  const { itemCount } = useCart();
+
   const [foods, setFoods] = useState([]);
   const [search, setSearch] = useState("");
-
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // Load food from JSON Server
   useEffect(() => {
-    async function loadFoods() {
+    const loadFoods = async () => {
       try {
         setLoading(true);
         setError("");
 
-        const data = await getFoods();
+        const response = await fetch(`${API_URL}/foods`);
+
+        if (!response.ok) {
+          throw new Error("Failed to load foods");
+        }
+
+        const data = await response.json();
 
         setFoods(data);
       } catch (error) {
+        console.error(error);
+
         setError(
-          "Unable to load menu. Please try again."
+          "Unable to load the menu. Please check your connection."
         );
       } finally {
         setLoading(false);
       }
-    }
+    };
 
     loadFoods();
   }, []);
 
+  // Search foods
   const filteredFoods = foods.filter((food) =>
     food.name
       .toLowerCase()
       .includes(search.toLowerCase())
   );
 
-  if (loading) {
-    return (
-      <div className="state-container">
-        <div className="spinner"></div>
-
-        <h2>Loading menu...</h2>
-
-        <p>
-          Getting today's delicious food.
-        </p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="state-container">
-
-        <h2>
-          😕 Something went wrong
-        </h2>
-
-        <p>{error}</p>
-
-      </div>
-    );
-  }
-
   return (
     <main className="menu-page">
 
-      {/* HERO */}
+      {/* ================= HEADER ================= */}
 
-      <section className="menu-hero">
+      <header className="menu-header">
 
-        <span className="hero-label">
-          CAMPUS CANTEEN
-        </span>
+        <div className="menu-title">
 
-        <h1>
-          Good food.
-          <br />
-          <span>Less waiting.</span>
-        </h1>
+          <span className="page-label">
+            CAMPUS CANTEEN
+          </span>
 
-        <p>
-          Order ahead and skip the canteen queue.
-        </p>
+          <h1>CampusBite</h1>
+
+          <p>
+            Order your favourite food before reaching
+            the canteen.
+          </p>
+
+        </div>
+
+        {/* CART BUTTON */}
+
+        <button
+          type="button"
+          className="cart-button"
+          onClick={() => navigate("/cart")}
+        >
+          🛒 Cart ({itemCount})
+        </button>
+
+      </header>
+
+
+      {/* ================= SEARCH ================= */}
+
+      <section className="search-section">
+
+        <SearchBar
+          value={search}
+          onChange={setSearch}
+        />
 
       </section>
 
 
-      {/* MENU */}
+      {/* ================= LOADING ================= */}
 
-      <section className="menu-section">
+      {loading && (
+        <section className="loading-state">
 
-        <div className="menu-heading">
+          <div className="spinner"></div>
 
-          <div>
+          <h2>Loading menu...</h2>
 
-            <h2>
-              Today's Menu
-            </h2>
+          <p>
+            Please wait while we load today's food.
+          </p>
 
-            <p>
-              Fresh food ready for your break.
-            </p>
+        </section>
+      )}
 
+
+      {/* ================= ERROR ================= */}
+
+      {!loading && error && (
+        <section className="error-state">
+
+          <div className="error-icon">
+            ⚠️
           </div>
 
-          <span className="food-count">
-            {foods.length} items
-          </span>
+          <h2>Something went wrong</h2>
 
-        </div>
+          <p>{error}</p>
+
+          <button
+            type="button"
+            onClick={() =>
+              window.location.reload()
+            }
+          >
+            Try Again
+          </button>
+
+        </section>
+      )}
 
 
-        {/* SEARCH */}
+      {/* ================= EMPTY SEARCH ================= */}
 
-        <SearchBar
-          search={search}
-          setSearch={setSearch}
-        />
-
-
-        {/* FOOD */}
-
-        {filteredFoods.length === 0 ? (
-
-          <div className="empty-search">
+      {!loading &&
+        !error &&
+        filteredFoods.length === 0 && (
+          <section className="empty-state">
 
             <div className="empty-icon">
-              🔍
+              🍽️
             </div>
 
-            <h3>
-              No food found
-            </h3>
+            <h2>No food found</h2>
 
             <p>
-              Try searching for another food item.
+              We couldn't find any food matching
+              "{search}".
             </p>
 
             <button
               type="button"
               onClick={() => setSearch("")}
             >
-              Show All Food
+              Clear Search
             </button>
 
-          </div>
+          </section>
+        )}
 
-        ) : (
 
-          <div className="food-grid">
+      {/* ================= FOOD CARDS ================= */}
+
+      {!loading &&
+        !error &&
+        filteredFoods.length > 0 && (
+          <section className="food-grid">
 
             {filteredFoods.map((food) => (
-
               <FoodCard
                 key={food.id}
                 food={food}
               />
-
             ))}
 
-          </div>
-
+          </section>
         )}
-
-      </section>
 
     </main>
   );

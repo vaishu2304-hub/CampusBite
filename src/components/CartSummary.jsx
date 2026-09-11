@@ -1,29 +1,54 @@
 import { useNavigate } from "react-router-dom";
-import { useCart } from "./context/CartContext";
+import { useCart } from "../context/CartContext";
 
 function CartSummary() {
-  const { total, itemCount } = useCart();
+  const {
+    cart,
+    total,
+    itemCount,
+  } = useCart();
+
   const navigate = useNavigate();
 
   return (
-    <div className="cart-summary">
+    <aside className="cart-summary">
+
       <h2>Order Summary</h2>
 
-      <p>
-        Items: <strong>{itemCount}</strong>
-      </p>
+      <div className="summary-row">
+        <span>Items</span>
+        <strong>{itemCount}</strong>
+      </div>
 
-      <p>
-        Total: <strong>₹{total}</strong>
-      </p>
+      <div className="summary-row">
+        <span>Food Items</span>
+        <strong>{cart.length}</strong>
+      </div>
+
+      <div className="summary-divider"></div>
+
+      <div className="summary-total">
+        <span>Total</span>
+        <strong>₹{total}</strong>
+      </div>
 
       <button
-        disabled={itemCount === 0}
+        type="button"
+        className="checkout-button"
         onClick={() => navigate("/checkout")}
       >
         Proceed to Checkout
       </button>
-    </div>
+
+      <button
+        type="button"
+        className="continue-shopping"
+        onClick={() => navigate("/")}
+      >
+        ← Continue Shopping
+      </button>
+
+    </aside>
   );
 }
 

@@ -1,27 +1,28 @@
-function SearchBar({ search, setSearch }) {
+function SearchBar({ value, onChange }) {
   return (
-    <div className="search-container">
+    <div className="search-bar">
+      <span className="search-icon">🔍</span>
 
       <input
         type="text"
-        value={search}
+        value={value}
         maxLength={100}
-        onChange={(event) => {
-          setSearch(event.target.value);
-        }}
-        placeholder="Search burgers, pizza, biryani..."
-        aria-label="Search food"
+        placeholder="Search for food..."
+        onChange={(event) =>
+          onChange(event.target.value)
+        }
       />
 
-      {search && (
+      {value && (
         <button
           type="button"
-          onClick={() => setSearch("")}
+          className="clear-search"
+          onClick={() => onChange("")}
+          aria-label="Clear search"
         >
-          Clear
+          ×
         </button>
       )}
-
     </div>
   );
 }

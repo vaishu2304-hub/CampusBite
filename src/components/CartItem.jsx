@@ -1,4 +1,4 @@
-import { useCart } from "./context/CartContext";
+import { useCart } from "../context/CartContext";
 
 function CartItem({ item }) {
   const {
@@ -8,34 +8,81 @@ function CartItem({ item }) {
   } = useCart();
 
   return (
-    <div className="cart-item">
-      <div>
-        <h3>{item.name}</h3>
-        <p>₹{item.price} each</p>
+    <article className="cart-item">
+
+      <div className="cart-item-image">
+        <img
+          src={item.image}
+          alt={item.name}
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
       </div>
 
-      <div className="quantity-controls">
-        <button onClick={() => decreaseQuantity(item.id)}>
-          −
-        </button>
+      <div className="cart-item-content">
 
-        <span>{item.quantity}</span>
+        <div className="cart-item-info">
 
-        <button onClick={() => increaseQuantity(item.id)}>
-          +
-        </button>
+          <span className="cart-item-category">
+            {item.category}
+          </span>
+
+          <h3>{item.name}</h3>
+
+          <p>₹{item.price} each</p>
+
+        </div>
+
+        <div className="cart-item-actions">
+
+          <div className="quantity-controls">
+
+            <button
+              type="button"
+              onClick={() =>
+                decreaseQuantity(item.id)
+              }
+              aria-label={`Decrease ${item.name}`}
+            >
+              −
+            </button>
+
+            <span>
+              {item.quantity}
+            </span>
+
+            <button
+              type="button"
+              onClick={() =>
+                increaseQuantity(item.id)
+              }
+              aria-label={`Increase ${item.name}`}
+            >
+              +
+            </button>
+
+          </div>
+
+          <button
+            type="button"
+            className="remove-button"
+            onClick={() =>
+              removeFromCart(item.id)
+            }
+          >
+            Remove
+          </button>
+
+        </div>
+
       </div>
 
-      <p>
-        ₹{item.price * item.quantity}
-      </p>
+      <div className="cart-item-price">
+        ₹{Number(item.price) * item.quantity}
+      </div>
 
-      <button
-        onClick={() => removeFromCart(item.id)}
-      >
-        Remove
-      </button>
-    </div>
+    </article>
   );
 }
 

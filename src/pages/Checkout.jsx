@@ -1,154 +1,317 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useCart } from "./context/CartContext";
+import { useCart } from "../context/CartContext";
+import { createOrder } from "../services/api";
 
 function Checkout() {
-  const { cart, total, clearCart } = useCart();
+
   const navigate = useNavigate();
 
-  const [name, setName] = useState("");
-  const [studentId, setStudentId] = useState("");
+  const {
+    cart,
+    total,
+    clearCart
+  } = useCart();
 
-  const [errors, setErrors] = useState({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [name, setName] =
+    useState("");
 
-  const validateForm = () => {
-    const newErrors = {};
+  const [studentId, setStudentId] =
+    useState("");
 
-    if (!name.trim()) {
-      newErrors.name = "Name is required.";
-    }
+  const [error, setError] =
+    useState("");
 
-    if (!studentId.trim()) {
-      newErrors.studentId = "Student ID is required.";
-    }
+  const [submitting, setSubmitting] =
+    useState(false);
 
-    if (cart.length === 0) {
-      newErrors.cart = "Your cart is empty.";
-    }
 
-    setErrors(newErrors);
+  if (cart.length === 0) {
 
-    return Object.keys(newErrors).length === 0;
-  };
+    return (
+      <main className="checkout-page">
 
-  const handleSubmit = async (event) => {
+        <div className="checkout-card">
+
+          <h2>
+            Your cart is empty
+          </h2>
+
+          <button
+            type="button"
+            className="continue-shopping"
+            onClick={() => navigate("/")}
+          >
+            ← Back to Menu
+          </button>
+
+        </div>
+
+      </main>
+    );
+  }
+
+
+  async function handleSubmit(event) {
+
     event.preventDefault();
 
-    if (!validateForm()) {
+    if (submitting) {
       return;
     }
 
-    setIsSubmitting(true);
+    setError("");
 
-    const orderData = {
-      studentName: name.trim(),
-      studentId: studentId.trim(),
-      items: cart,
-      total: total,
-    };
 
-    console.log("Order data:", orderData);
+    const cleanName =
+      name.trim();
 
-    /*
-      TEMPORARY:
-      Member 3 will connect the real API here.
-    */
+    const cleanStudentId =
+      studentId.trim();
+
+
+    if (!cleanName) {
+
+      setError(
+        "Please enter your student name."
+      );
+
+      return;
+    }
+
+
+    if (!cleanStudentId) {
+
+      setError(
+        "Please enter your student ID."
+      );
+
+      return;
+    }
+
+
+    setSubmitting(true);
+
 
     try {
-      // Temporary delay only for testing the UI.
-      // Replace this with Member 3's createOrder() API.
-      await new Promise((resolve) =>
-        setTimeout(resolve, 1000)
+
+      const orderData = {
+
+        name: cleanName,
+
+        studentId:
+          cleanStudentId,
+
+        items: cart.map(item => ({
+          id: item.id,
+
+          quantity:
+            Number(item.quantity)
+        }))
+      };
+
+
+      console.log(
+        "ORDER DATA:",
+        orderData
       );
+
+
+      const order =
+        await createOrder(
+          orderData
+        );
+
+
+      console.log(
+        "CREATED ORDER:",
+        order
+      );
+
+
+      localStorage.setItem(
+        "campusbite-last-order",
+        JSON.stringify(order)
+      );
+
 
       clearCart();
 
-      navigate("/order");
+
+      navigate(
+        "/order-success"
+      );
+
     } catch (error) {
-      setErrors({
-        submit: "Unable to place order. Please try again.",
-      });
+
+      console.error(
+        "PLACE ORDER ERROR:",
+        error
+      );
+
+      setError(
+        error.message ||
+        "Unable to place order. Please try again."
+      );
+
     } finally {
-      setIsSubmitting(false);
+
+      setSubmitting(false);
+
     }
-  };
+  }
+
 
   return (
-    <div className="checkout-page">
-      <h1>Checkout</h1>
+    <main className="checkout-page">
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>Student Name</label>
-
-          <input
-            type="text"
-            value={name}
-            maxLength={60}
-            onChange={(event) =>
-              setName(event.target.value)
-            }
-            placeholder="Enter your name"
-          />
-
-          {errors.name && (
-            <p className="error">
-              {errors.name}
-            </p>
-          )}
-        </div>
+      <div className="page-header">
 
         <div>
-          <label>Student ID</label>
 
-          <input
-            type="text"
-            value={studentId}
-            maxLength={30}
-            onChange={(event) =>
-              setStudentId(event.target.value)
-            }
-            placeholder="Enter your student ID"
-          />
+          <span className="page-label">
+            CHECKOUT
+          </span>
 
-          {errors.studentId && (
-            <p className="error">
-              {errors.studentId}
-            </p>
-          )}
+          <h1>
+            Complete Your Order
+          </h1>
+
+          <p>
+            Enter your student details to place your order.
+          </p>
+
         </div>
 
-        <div className="checkout-summary">
-          <h2>Order Summary</h2>
+      </div>
 
-          {cart.map((item) => (
-            <p key={item.id}>
-              {item.name} × {item.quantity}
-              {" — "}
-              ₹{item.price * item.quantity}
-            </p>
+
+      <div className="checkout-layout">
+
+        <form
+          className="checkout-form"
+          onSubmit={handleSubmit}
+        >
+
+          <div className="form-group">
+
+            <label htmlFor="student-name">
+              Student Name
+            </label>
+
+            <input
+              id="student-name"
+              type="text"
+              value={name}
+              onChange={(e) =>
+                setName(e.target.value)
+              }
+              placeholder="Enter your name"
+              maxLength={100}
+              disabled={submitting}
+              required
+            />
+
+          </div>
+
+
+          <div className="form-group">
+
+            <label htmlFor="student-id">
+              Student ID
+            </label>
+
+            <input
+              id="student-id"
+              type="text"
+              value={studentId}
+              onChange={(e) =>
+                setStudentId(
+                  e.target.value
+                )
+              }
+              placeholder="Enter your student ID"
+              maxLength={50}
+              disabled={submitting}
+              required
+            />
+
+          </div>
+
+
+          {error && (
+
+            <div className="form-error">
+              ⚠️ {error}
+            </div>
+
+          )}
+
+
+          <button
+            type="submit"
+            className="place-order-button"
+            disabled={submitting}
+          >
+
+            {submitting
+              ? "Placing Order..."
+              : "Place Order"}
+
+          </button>
+
+        </form>
+
+
+        <aside className="checkout-summary">
+
+          <h2>
+            Your Order
+          </h2>
+
+          {cart.map(item => (
+
+            <div
+              className="checkout-item"
+              key={item.id}
+            >
+
+              <span>
+                {item.name} × {item.quantity}
+              </span>
+
+              <strong>
+                ₹
+                {Number(item.price) *
+                  Number(item.quantity)}
+              </strong>
+
+            </div>
+
           ))}
 
-          <h3>Total: ₹{total}</h3>
-        </div>
 
-        {errors.submit && (
-          <p className="error">
-            {errors.submit}
-          </p>
-        )}
+          <div className="summary-divider"></div>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-        >
-          {isSubmitting
-            ? "Placing Order..."
-            : "Place Order"}
-        </button>
-      </form>
-    </div>
+
+          <div className="summary-total">
+
+            <span>
+              Total
+            </span>
+
+            <strong>
+              ₹
+              {Number(total).toFixed(0)}
+            </strong>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+    </main>
   );
 }
 
